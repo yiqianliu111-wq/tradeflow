@@ -1,0 +1,13 @@
+node_modules/
+artifacts/
+cache/
+coverage/
+typechain-types/
+.env
+.openzeppelin/
+security/slither-stdout.txt
+security/slither-stderr.txt
+logs/
+frontend-dev.log
+frontend/node_modules/
+frontend/dist/

@@ -1,0 +1,16 @@
+﻿'npx hardhat clean' running (wd: C:\Users\DELL\Documents\New project\tradeflow)
+'npx hardhat clean --global' running (wd: C:\Users\DELL\Documents\New project\tradeflow)
+'npx hardhat compile --force' running (wd: C:\Users\DELL\Documents\New project\tradeflow)
+INFO:Detectors:
+Detector: timestamp
+TradeFlow.createDeal(address,uint256,uint256,uint256,uint256,uint256) (contracts/TradeFlow.sol#171-208) uses timestamp for comparisons
+	Dangerous comparisons:
+	- expiryDeadline <= block.timestamp || dueDate <= expiryDeadline (contracts/TradeFlow.sol#182)
+TradeFlow.markExpired(uint256) (contracts/TradeFlow.sol#389-400) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp <= deal.expiryDeadline (contracts/TradeFlow.sol#392)
+TradeFlow._expireIfNeeded(uint256,TradeFlow.Deal) (contracts/TradeFlow.sol#445-454) uses timestamp for comparisons
+	Dangerous comparisons:
+	- ! _isExpirable(deal.status) || block.timestamp <= deal.expiryDeadline (contracts/TradeFlow.sol#446)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+INFO:Slither:. analyzed (22 contracts with 101 detectors), 3 result(s) found

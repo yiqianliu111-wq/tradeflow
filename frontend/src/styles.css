@@ -1,0 +1,497 @@
+:root {
+  color: #17202a;
+  background: #f4f6f8;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  min-height: 40px;
+  border: 1px solid #c8d0d8;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #17202a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  border-color: #316d89;
+  background: #f7fbfd;
+}
+
+button:disabled {
+  color: #8b97a4;
+  cursor: not-allowed;
+  background: #eef1f4;
+}
+
+input {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #c8d0d8;
+  border-radius: 6px;
+  padding: 0 10px;
+  color: #17202a;
+  background: #ffffff;
+}
+
+.app-shell {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: #316d89;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 750;
+}
+
+h2 {
+  font-size: 16px;
+}
+
+h3 {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.wallet-panel {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.network-ok,
+.network-bad {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.network-ok {
+  background: #e8f3ec;
+  color: #1f6b45;
+}
+
+.network-bad {
+  background: #fff0eb;
+  color: #a33c22;
+}
+
+.primary {
+  background: #245a73;
+  border-color: #245a73;
+  color: white;
+}
+
+.primary:hover:not(:disabled) {
+  background: #1d4b60;
+  border-color: #1d4b60;
+}
+
+.wide {
+  width: 100%;
+}
+
+.control-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.metric,
+.role-card,
+.panel {
+  border: 1px solid #d7dde3;
+  background: #ffffff;
+  border-radius: 8px;
+}
+
+.metric {
+  padding: 12px;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.metric span,
+.field span,
+.key-value span,
+.role-card span {
+  color: #64717f;
+  font-size: 12px;
+}
+
+.metric strong {
+  margin-top: 4px;
+  font-size: 18px;
+  word-break: break-word;
+}
+
+.metric-good strong {
+  color: #1f6b45;
+}
+
+.metric-danger strong {
+  color: #a33c22;
+}
+
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.role-hint {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #bed3df;
+  background: #f5f9fb;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  color: #245a73;
+}
+
+.role-hint div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.role-hint strong {
+  font-size: 14px;
+}
+
+.role-hint span {
+  color: #465666;
+  font-size: 13px;
+}
+
+.role-card {
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+}
+
+.role-card.active {
+  border-color: #316d89;
+  box-shadow: inset 0 0 0 1px #316d89;
+}
+
+.role-card div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.role-card strong,
+.role-card span {
+  overflow-wrap: anywhere;
+}
+
+.main-grid {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.panel {
+  padding: 16px;
+}
+
+.panel-wide {
+  grid-column: 1 / -1;
+}
+
+.panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.two-col,
+.deal-selector {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+.deal-selector {
+  grid-template-columns: minmax(0, 1fr) 44px;
+}
+
+.icon-button {
+  width: 44px;
+  padding: 0;
+}
+
+.deal-view {
+  display: grid;
+  gap: 10px;
+}
+
+.deal-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  border-bottom: 1px solid #e3e7eb;
+  padding-bottom: 10px;
+  margin-bottom: 2px;
+}
+
+.status {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.status-Created,
+.status-DocumentsSubmitted,
+.status-RevisionRequested,
+.status-CompliancePassed,
+.status-CreditApproved,
+.status-Funded {
+  background: #eaf2f6;
+  color: #245a73;
+}
+
+.status-PaymentReleased {
+  background: #e8f3ec;
+  color: #1f6b45;
+}
+
+.status-Frozen,
+.status-Rejected,
+.status-Expired {
+  background: #fff0eb;
+  color: #a33c22;
+}
+
+.key-value {
+  min-height: 34px;
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.key-value strong {
+  overflow-wrap: anywhere;
+}
+
+.role-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.role-summary span {
+  color: #64717f;
+}
+
+.role-summary strong {
+  background: #eef4f7;
+  color: #245a73;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 12px;
+}
+
+.action-columns {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.button-stack {
+  display: grid;
+  gap: 8px;
+}
+
+.audit-table {
+  display: grid;
+  gap: 8px;
+}
+
+.audit-row {
+  display: grid;
+  grid-template-columns: 110px 190px minmax(0, 1fr) 96px;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid #e3e7eb;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.audit-row span,
+.audit-row strong {
+  overflow-wrap: anywhere;
+}
+
+.audit-row span {
+  color: #64717f;
+  font-size: 12px;
+}
+
+.audit-row strong {
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.audit-row a {
+  color: #245a73;
+  font-weight: 700;
+}
+
+.audit-head {
+  min-height: 38px;
+  background: #f1f4f6;
+  font-weight: 800;
+}
+
+.audit-head span {
+  color: #465666;
+}
+
+.audit-success {
+  background: #f4faf6;
+}
+
+.audit-error {
+  background: #fff7f4;
+}
+
+.audit-info {
+  background: #f5f9fb;
+}
+
+.empty-state {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #c8d0d8;
+  border-radius: 6px;
+  color: #64717f;
+  padding: 14px;
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .control-strip,
+  .role-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .main-grid,
+  .action-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-wide {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    padding: 14px;
+  }
+
+  .topbar {
+    flex-direction: column;
+  }
+
+  .wallet-panel {
+    justify-content: flex-start;
+  }
+
+  .control-strip,
+  .role-grid,
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .key-value,
+  .audit-row {
+    grid-template-columns: 1fr;
+  }
+}

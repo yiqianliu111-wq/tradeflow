@@ -1,0 +1,22 @@
+{
+  "name": "tradeflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Audit-aware SME invoice financing workflow DApp for Sepolia.",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:gas": "REPORT_GAS=true hardhat test",
+    "deploy:localhost": "hardhat run scripts/deploy-localhost.js --network localhost",
+    "deploy:sepolia": "hardhat run scripts/deploy-sepolia.js --network sepolia",
+    "grant:sepolia": "hardhat run scripts/grant-sepolia-roles.js --network sepolia",
+    "frontend:dev": "cd frontend && npm run dev",
+    "frontend:build": "npm --prefix frontend run build"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "dotenv": "^16.4.5",
+    "hardhat": "^2.26.0"
+  }
+}

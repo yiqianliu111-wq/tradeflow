@@ -1,0 +1,15 @@
+{
+  "network": "localhost",
+  "chainId": 31337,
+  "contracts": {
+    "tradeFlow": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "abi": []
+    },
+    "mockUSD": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "abi": []
+    }
+  },
+  "demoAccounts": {}
+}
