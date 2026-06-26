@@ -262,8 +262,8 @@ function App() {
   const roleCards = useMemo(
     () => [
       { label: "Admin", address: deployment.demoAccounts?.admin, icon: ShieldCheck },
-      { label: "Exporter", address: deployment.demoAccounts?.exporter, icon: FilePlus2 },
-      { label: "Importer", address: deployment.demoAccounts?.importer, icon: ClipboardCheck },
+      { label: "Exporter", address: deployment.demoAccounts?.exporter, fallback: "Deal-level participant", icon: FilePlus2 },
+      { label: "Importer", address: deployment.demoAccounts?.importer, fallback: "Recorded counterparty", icon: ClipboardCheck },
       { label: "Compliance", address: deployment.demoAccounts?.compliance, icon: Lock },
       { label: "Credit", address: deployment.demoAccounts?.credit, icon: FileCheck2 },
       { label: "Treasury", address: deployment.demoAccounts?.treasury, icon: Banknote },
@@ -901,12 +901,13 @@ function WorkflowTracker({ status }) {
 
 function RoleCard({ role, active }) {
   const Icon = role.icon;
+  const detail = role.address ? shortAddress(role.address) : role.fallback || "Not configured";
   return (
     <div className={active ? "role-card active" : "role-card"}>
       <Icon size={18} />
       <div>
         <strong>{role.label}</strong>
-        <span>{shortAddress(role.address)}</span>
+        <span>{detail}</span>
       </div>
     </div>
   );
