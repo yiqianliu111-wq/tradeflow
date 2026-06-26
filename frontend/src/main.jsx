@@ -5,6 +5,7 @@ import {
   Banknote,
   CheckCircle2,
   ClipboardCheck,
+  ExternalLink,
   FileCheck2,
   FilePlus2,
   Lock,
@@ -29,6 +30,15 @@ const STATUS = [
   "PaymentReleased",
   "Rejected",
   "Expired",
+];
+
+const WORKFLOW_STEPS = [
+  "Created",
+  "DocumentsSubmitted",
+  "CompliancePassed",
+  "CreditApproved",
+  "Funded",
+  "PaymentReleased",
 ];
 
 const ZERO_HASH = "0x0000000000000000000000000000000000000000000000000000000000000000";
@@ -66,45 +76,70 @@ function txExplorerUrl(txHash) {
   return `https://sepolia.etherscan.io/tx/${txHash}`;
 }
 
+function addressExplorerUrl(address) {
+  if (BigInt(deployment.chainId ?? 0) !== SEPOLIA_CHAIN_ID) return "";
+  return `https://sepolia.etherscan.io/address/${address}`;
+}
+
+function formatDate(timestamp) {
+  if (!timestamp) return "Not set";
+  return new Date(timestamp * 1000).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function workflowState(status, step) {
+  const currentIndex = WORKFLOW_STEPS.indexOf(status);
+  const stepIndex = WORKFLOW_STEPS.indexOf(step);
+
+  if (status === "Frozen" || status === "Rejected" || status === "Expired") return "blocked";
+  if (currentIndex === -1) return "pending";
+  if (stepIndex < currentIndex) return "complete";
+  if (stepIndex === currentIndex) return "current";
+  return "pending";
+}
+
 function roleCapability(roles, account) {
   if (!account) {
     return {
       title: "No wallet connected",
-      detail: "Connect a demo wallet to operate the workflow and record transactions.",
+      detail: "Read-only Sepolia dashboard",
     };
   }
 
   if (roles.includes("Compliance")) {
     return {
       title: "You are: Compliance Officer",
-      detail: "Can pass, request revision, reject, or freeze submitted deals.",
+      detail: "KYC/AML review and exception control",
     };
   }
 
   if (roles.includes("Credit")) {
     return {
       title: "You are: Credit Officer",
-      detail: "Can approve or reject financing only after compliance has passed.",
+      detail: "Post-compliance credit approval",
     };
   }
 
   if (roles.includes("Treasury")) {
     return {
       title: "You are: Treasury Operations",
-      detail: "Can fund approved deals and release MockUSD from the liquidity pool.",
+      detail: "Liquidity reservation and MockUSD disbursement",
     };
   }
 
   if (roles.includes("Admin")) {
     return {
       title: "You are: System Admin",
-      detail: "Can manage bank roles and emergency pause controls.",
+      detail: "Role administration and emergency control",
     };
   }
 
   return {
     title: "You are: Exporter / Applicant",
-    detail: "Can create financing applications and submit hashes for your own deals.",
+    detail: "Application creation and document hash submission",
   };
 }
 
@@ -529,6 +564,7 @@ function App() {
         <div>
           <p className="eyebrow">TradeFlow</p>
           <h1>SME Invoice Financing Control Desk</h1>
+          <p className="subtitle">Sepolia trade finance workflow with role-separated controls and on-chain audit evidence.</p>
         </div>
         <div className="wallet-panel">
           <div className={networkOk ? "network-ok" : "network-bad"}>
@@ -542,7 +578,11 @@ function App() {
       </section>
 
       <section className="control-strip">
-        <Metric label="TradeFlow" value={shortAddress(deployment.contracts.tradeFlow.address)} />
+        <Metric
+          label="TradeFlow"
+          value={shortAddress(deployment.contracts.tradeFlow.address)}
+          href={addressExplorerUrl(deployment.contracts.tradeFlow.address)}
+        />
         <Metric label="Available MockUSD" value={formatToken(liquidity)} />
         <Metric label="Next Deal ID" value={nextDealId.toString()} />
         <Metric label="System" value={paused ? "Paused" : "Active"} tone={paused ? "danger" : "good"} />
@@ -563,7 +603,7 @@ function App() {
       </section>
 
       <section className="main-grid">
-        <Panel title="Create Deal" icon={FilePlus2}>
+        <Panel title="New Financing Request" icon={FilePlus2}>
           <Field label="Importer address">
             <input
               value={createForm.importer}
@@ -617,19 +657,24 @@ function App() {
           {selectedDeal ? (
             <div className="deal-view">
               <div className="deal-header">
-                <span className={statusClass(selectedDeal.status)}>{selectedDeal.status}</span>
-                <span>{formatToken(selectedDeal.financedAmount)} mUSD financed</span>
+                <div>
+                  <span className={statusClass(selectedDeal.status)}>{selectedDeal.status}</span>
+                  <p>Deal #{selectedDealId}</p>
+                </div>
+                <strong>{formatToken(selectedDeal.financedAmount)} mUSD financed</strong>
+              </div>
+              <WorkflowTracker status={selectedDeal.status} />
+              <div className="amount-grid">
+                <MiniMetric label="Invoice" value={formatToken(selectedDeal.invoiceAmount)} />
+                <MiniMetric label="Advance" value={`${Number(selectedDeal.advanceRateBps) / 100}%`} />
+                <MiniMetric label="Fee" value={`${formatToken(selectedDeal.financingFee)} mUSD`} />
+                <MiniMetric label="Net Disbursement" value={`${formatToken(selectedDeal.financedAmount - selectedDeal.financingFee)} mUSD`} tone="good" />
               </div>
               <KeyValue label="Exporter" value={shortAddress(selectedDeal.exporter)} />
               <KeyValue label="Importer" value={shortAddress(selectedDeal.importer)} />
-              <KeyValue label="Invoice" value={formatToken(selectedDeal.invoiceAmount)} />
-              <KeyValue label="Advance rate" value={`${Number(selectedDeal.advanceRateBps) / 100}%`} />
               <KeyValue label="Financed amount" value={`${formatToken(selectedDeal.financedAmount)} mUSD`} />
-              <KeyValue label="Fee" value={`${formatToken(selectedDeal.financingFee)} mUSD`} />
-              <KeyValue
-                label="Net disbursement"
-                value={`${formatToken(selectedDeal.financedAmount - selectedDeal.financingFee)} mUSD`}
-              />
+              <KeyValue label="Invoice due" value={formatDate(selectedDeal.dueDate)} />
+              <KeyValue label="Funding window" value={formatDate(selectedDeal.expiryDeadline)} />
               <KeyValue label="Invoice hash" value={selectedDeal.invoiceHash === ZERO_HASH ? "Not submitted" : shortHash(selectedDeal.invoiceHash)} />
               <KeyValue label="Document hash" value={selectedDeal.tradeDocumentHash === ZERO_HASH ? "Not submitted" : shortHash(selectedDeal.tradeDocumentHash)} />
             </div>
@@ -645,7 +690,7 @@ function App() {
           </div>
 
           <div className="action-columns">
-            <div>
+            <div className="action-group">
               <h3>Exporter</h3>
               <Field label="Invoice text">
                 <input
@@ -665,7 +710,7 @@ function App() {
               </button>
             </div>
 
-            <div>
+            <div className="action-group">
               <h3>Compliance</h3>
               <Field label="Compliance memo">
                 <input
@@ -693,7 +738,7 @@ function App() {
               </div>
             </div>
 
-            <div>
+            <div className="action-group">
               <h3>Credit</h3>
               <Field label="Approval note">
                 <input
@@ -713,7 +758,7 @@ function App() {
               </div>
             </div>
 
-            <div>
+            <div className="action-group">
               <h3>Treasury</h3>
               <div className="button-stack">
                 <button onClick={() => action("Fund deal", "fundDeal")} disabled={busy}>
@@ -806,11 +851,46 @@ function Field({ label, children }) {
   );
 }
 
-function Metric({ label, value, tone }) {
-  return (
-    <div className={`metric metric-${tone || "neutral"}`}>
+function Metric({ label, value, tone, href }) {
+  const content = (
+    <>
       <span>{label}</span>
       <strong>{value}</strong>
+    </>
+  );
+
+  return (
+    <div className={`metric metric-${tone || "neutral"}`}>
+      {href ? (
+        <a href={href} target="_blank" rel="noreferrer">
+          {content}
+          <ExternalLink size={14} />
+        </a>
+      ) : (
+        content
+      )}
+    </div>
+  );
+}
+
+function MiniMetric({ label, value, tone }) {
+  return (
+    <div className={`mini-metric mini-${tone || "neutral"}`}>
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  );
+}
+
+function WorkflowTracker({ status }) {
+  return (
+    <div className="workflow-tracker" aria-label="Deal workflow progress">
+      {WORKFLOW_STEPS.map((step) => (
+        <div className={`workflow-step workflow-${workflowState(status, step)}`} key={step}>
+          <span />
+          <strong>{step}</strong>
+        </div>
+      ))}
     </div>
   );
 }
