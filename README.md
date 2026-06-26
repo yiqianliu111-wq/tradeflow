@@ -6,6 +6,15 @@ It is a portfolio project for banking trade finance, operations, and technology-
 
 TradeFlow is not a production banking system and not a full letter of credit platform. It deliberately focuses on the operational and compliance control layer of invoice financing.
 
+## Live Demo And Links
+
+| Resource | Link |
+| --- | --- |
+| Public frontend | [https://tradeflow-navy-one.vercel.app/](https://tradeflow-navy-one.vercel.app/) |
+| GitHub repository | [https://github.com/yiqianliu111-wq/tradeflow](https://github.com/yiqianliu111-wq/tradeflow) |
+| TradeFlow contract | [0x27D887fD80167d6e2B989058c3743Bb6bbC03f57](https://sepolia.etherscan.io/address/0x27D887fD80167d6e2B989058c3743Bb6bbC03f57) |
+| MockUSD contract | [0x117A20022D26c21948625837D05646bc9a7Ed52e](https://sepolia.etherscan.io/address/0x117A20022D26c21948625837D05646bc9a7Ed52e) |
+
 ## Business Scenario
 
 An SME exporter applies for financing against an invoice owed by an importer. The workflow is:

@@ -2,6 +2,15 @@
 
 This guide prepares TradeFlow for a public testnet demo.
 
+## Public Deployment
+
+| Resource | Link |
+| --- | --- |
+| Public frontend | [https://tradeflow-navy-one.vercel.app/](https://tradeflow-navy-one.vercel.app/) |
+| GitHub repository | [https://github.com/yiqianliu111-wq/tradeflow](https://github.com/yiqianliu111-wq/tradeflow) |
+| TradeFlow contract | [0x27D887fD80167d6e2B989058c3743Bb6bbC03f57](https://sepolia.etherscan.io/address/0x27D887fD80167d6e2B989058c3743Bb6bbC03f57) |
+| MockUSD contract | [0x117A20022D26c21948625837D05646bc9a7Ed52e](https://sepolia.etherscan.io/address/0x117A20022D26c21948625837D05646bc9a7Ed52e) |
+
 ## 1. Prerequisites
 
 - MetaMask or another wallet
