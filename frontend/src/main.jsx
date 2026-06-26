@@ -42,6 +42,14 @@ const WORKFLOW_STEPS = [
   "PaymentReleased",
 ];
 
+const EXPIRABLE_STATUSES = new Set([
+  "Created",
+  "DocumentsSubmitted",
+  "RevisionRequested",
+  "CompliancePassed",
+  "CreditApproved",
+]);
+
 const ZERO_HASH = "0x0000000000000000000000000000000000000000000000000000000000000000";
 const SECONDS_IN_DAY = 24 * 60 * 60;
 const TRADE_FLOW_INTERFACE = new ethers.Interface(deployment.contracts.tradeFlow.abi);
@@ -558,6 +566,27 @@ function App() {
 
   const networkOk = chainId === null || chainId === expectedChain;
   const roleHint = roleCapability(roles, account);
+  const selectedStatus = selectedDeal?.status;
+  const connectedWorkflowReady = Boolean(account && signer && tradeFlow) && networkOk && !paused && !busy;
+  const lowerAccount = account?.toLowerCase();
+  const isDealExporter = Boolean(selectedDeal && lowerAccount === selectedDeal.exporter?.toLowerCase());
+  const hasComplianceRole = roles.includes("Compliance");
+  const hasCreditRole = roles.includes("Credit");
+  const hasTreasuryRole = roles.includes("Treasury");
+  const canCreateDeal = connectedWorkflowReady;
+  const canSubmitDocuments =
+    connectedWorkflowReady && isDealExporter && ["Created", "RevisionRequested"].includes(selectedStatus);
+  const canComplianceAction = connectedWorkflowReady && hasComplianceRole && selectedStatus === "DocumentsSubmitted";
+  const canCreditAction = connectedWorkflowReady && hasCreditRole && selectedStatus === "CompliancePassed";
+  const canFundDeal = connectedWorkflowReady && hasTreasuryRole && selectedStatus === "CreditApproved";
+  const canReleasePayment = connectedWorkflowReady && hasTreasuryRole && selectedStatus === "Funded";
+  const canMarkExpired =
+    connectedWorkflowReady &&
+    selectedDeal &&
+    EXPIRABLE_STATUSES.has(selectedStatus) &&
+    Math.floor(Date.now() / 1000) > selectedDeal.expiryDeadline;
+  const canRunRoleMismatchDemo = connectedWorkflowReady && Boolean(selectedDeal);
+  const canRunDuplicateInvoiceDemo = connectedWorkflowReady && selectedDealReady;
 
   return (
     <main className="app-shell">
@@ -642,7 +671,12 @@ function App() {
               />
             </Field>
           </div>
-          <button className="primary wide" onClick={createDeal} disabled={busy}>
+          <button
+            className="primary wide"
+            onClick={createDeal}
+            disabled={!canCreateDeal}
+            title={canCreateDeal ? "Create a new financing application" : "Connect the correct wallet/network first"}
+          >
             <FilePlus2 size={18} />
             Create Financing Application
           </button>
@@ -708,7 +742,15 @@ function App() {
                   onChange={(event) => setDocumentForm({ ...documentForm, documentText: event.target.value })}
                 />
               </Field>
-              <button onClick={submitDocuments} disabled={busy}>
+              <button
+                onClick={submitDocuments}
+                disabled={!canSubmitDocuments}
+                title={
+                  canSubmitDocuments
+                    ? "Submit hash-only document evidence"
+                    : "Requires the deal exporter and Created or RevisionRequested status"
+                }
+              >
                 <FileCheck2 size={17} />
                 Submit Hashes
               </button>
@@ -723,19 +765,35 @@ function App() {
                 />
               </Field>
               <div className="button-stack">
-                <button onClick={() => action("Pass compliance", "passCompliance", memoForm.complianceMemo)} disabled={busy}>
+                <button
+                  onClick={() => action("Pass compliance", "passCompliance", memoForm.complianceMemo)}
+                  disabled={!canComplianceAction}
+                  title={canComplianceAction ? "Pass KYC/AML review" : "Requires Compliance role and DocumentsSubmitted status"}
+                >
                   <CheckCircle2 size={17} />
                   Pass
                 </button>
-                <button onClick={() => action("Request revision", "requestRevision", memoForm.complianceMemo)} disabled={busy}>
+                <button
+                  onClick={() => action("Request revision", "requestRevision", memoForm.complianceMemo)}
+                  disabled={!canComplianceAction}
+                  title={canComplianceAction ? "Request document revision" : "Requires Compliance role and DocumentsSubmitted status"}
+                >
                   <RefreshCw size={17} />
                   Revision
                 </button>
-                <button onClick={() => action("Freeze deal", "freezeDeal", memoForm.complianceMemo)} disabled={busy}>
+                <button
+                  onClick={() => action("Freeze deal", "freezeDeal", memoForm.complianceMemo)}
+                  disabled={!canComplianceAction}
+                  title={canComplianceAction ? "Freeze a compliance-risk deal" : "Requires Compliance role and DocumentsSubmitted status"}
+                >
                   <AlertTriangle size={17} />
                   Freeze
                 </button>
-                <button onClick={() => action("Reject at compliance", "rejectAtCompliance", memoForm.complianceMemo)} disabled={busy}>
+                <button
+                  onClick={() => action("Reject at compliance", "rejectAtCompliance", memoForm.complianceMemo)}
+                  disabled={!canComplianceAction}
+                  title={canComplianceAction ? "Reject at compliance stage" : "Requires Compliance role and DocumentsSubmitted status"}
+                >
                   <XCircle size={17} />
                   Reject
                 </button>
@@ -751,11 +809,19 @@ function App() {
                 />
               </Field>
               <div className="button-stack">
-                <button onClick={() => action("Approve credit", "approveCredit", memoForm.approvalNote)} disabled={busy}>
+                <button
+                  onClick={() => action("Approve credit", "approveCredit", memoForm.approvalNote)}
+                  disabled={!canCreditAction}
+                  title={canCreditAction ? "Approve after compliance pass" : "Requires Credit role and CompliancePassed status"}
+                >
                   <ClipboardCheck size={17} />
                   Approve
                 </button>
-                <button onClick={() => action("Reject at credit", "rejectAtCredit", memoForm.approvalNote)} disabled={busy}>
+                <button
+                  onClick={() => action("Reject at credit", "rejectAtCredit", memoForm.approvalNote)}
+                  disabled={!canCreditAction}
+                  title={canCreditAction ? "Reject at credit stage" : "Requires Credit role and CompliancePassed status"}
+                >
                   <XCircle size={17} />
                   Reject
                 </button>
@@ -765,15 +831,27 @@ function App() {
             <div className="action-group">
               <h3>Treasury</h3>
               <div className="button-stack">
-                <button onClick={() => action("Fund deal", "fundDeal")} disabled={busy}>
+                <button
+                  onClick={() => action("Fund deal", "fundDeal")}
+                  disabled={!canFundDeal}
+                  title={canFundDeal ? "Reserve MockUSD liquidity" : "Requires Treasury role and CreditApproved status"}
+                >
                   <Banknote size={17} />
                   Fund
                 </button>
-                <button onClick={() => action("Release payment", "releasePayment")} disabled={busy}>
+                <button
+                  onClick={() => action("Release payment", "releasePayment")}
+                  disabled={!canReleasePayment}
+                  title={canReleasePayment ? "Release net disbursement" : "Requires Treasury role and Funded status"}
+                >
                   <CheckCircle2 size={17} />
                   Release
                 </button>
-                <button onClick={() => action("Mark expired", "markExpired")} disabled={busy}>
+                <button
+                  onClick={() => action("Mark expired", "markExpired")}
+                  disabled={!canMarkExpired}
+                  title={canMarkExpired ? "Mark the deal expired" : "Only available after the funding window deadline"}
+                >
                   <PauseCircle size={17} />
                   Expire
                 </button>
@@ -784,11 +862,19 @@ function App() {
 
         <Panel title="Negative Flow" icon={AlertTriangle} wide>
           <div className="button-stack">
-            <button onClick={roleMismatchDemo} disabled={busy}>
+            <button
+              onClick={roleMismatchDemo}
+              disabled={!canRunRoleMismatchDemo}
+              title={canRunRoleMismatchDemo ? "Deliberately test a blocked role/state transition" : "Load a deal first"}
+            >
               <XCircle size={17} />
               Role mismatch demo
             </button>
-            <button onClick={duplicateInvoiceDemo} disabled={busy || !selectedDealReady}>
+            <button
+              onClick={duplicateInvoiceDemo}
+              disabled={!canRunDuplicateInvoiceDemo}
+              title={canRunDuplicateInvoiceDemo ? "Deliberately test duplicate invoice prevention" : "Load a deal with submitted hashes first"}
+            >
               <AlertTriangle size={17} />
               Duplicate invoice demo
             </button>

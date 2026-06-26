@@ -243,6 +243,10 @@ See [SECURITY.md](SECURITY.md) for Slither results and the security/control test
 
 The current Hardhat suite includes 23 passing tests. Slither reports only timestamp-related findings, which are accepted because timestamps are used for workflow deadline checks rather than randomness or value-critical price logic.
 
+## Report And Presentation Checklist
+
+See [docs/report-checklist.md](docs/report-checklist.md) for report structure, screenshot planning, and the recommended live-demo path.
+
 ## Scope Boundary
 
 The MVP does not model:
