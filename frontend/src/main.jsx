@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { ethers } from "ethers";
 import deployment from "./contracts/deployment.json";
+import tradeflowLogo from "./assets/tradeflow-logo.svg";
 import "./styles.css";
 
 const STATUS = [
@@ -561,10 +562,13 @@ function App() {
   return (
     <main className="app-shell">
       <section className="topbar">
-        <div>
-          <p className="eyebrow">TradeFlow</p>
-          <h1>SME Invoice Financing Control Desk</h1>
-          <p className="subtitle">Sepolia trade finance workflow with role-separated controls and on-chain audit evidence.</p>
+        <div className="brand-block">
+          <img className="brand-logo" src={tradeflowLogo} alt="TradeFlow logo" />
+          <div>
+            <p className="eyebrow">TradeFlow</p>
+            <h1>SME Invoice Financing Control Desk</h1>
+            <p className="subtitle">Sepolia trade finance workflow with role-separated controls and on-chain audit evidence.</p>
+          </div>
         </div>
         <div className="wallet-panel">
           <div className={networkOk ? "network-ok" : "network-bad"}>

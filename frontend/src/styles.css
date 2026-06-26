@@ -89,6 +89,21 @@ input {
   box-shadow: 0 10px 24px rgba(35, 64, 82, 0.06);
 }
 
+.brand-block {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  min-width: 0;
+}
+
+.brand-logo {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 auto;
+  border-radius: 16px;
+  box-shadow: 0 10px 18px rgba(36, 90, 115, 0.12);
+}
+
 .eyebrow {
   margin: 0 0 4px;
   color: var(--teal);
@@ -635,6 +650,16 @@ h3 {
   .topbar {
     flex-direction: column;
     padding: 16px;
+  }
+
+  .brand-block {
+    align-items: flex-start;
+  }
+
+  .brand-logo {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
   }
 
   .wallet-panel {
